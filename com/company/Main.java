@@ -18,9 +18,7 @@ public class Main {
     //profit
 
     public static void main(String[] args) {
-//        parseCoordFile(new File("~/src/coordinates.txt"));
-
-        Grid grid = new Grid(parseFile(new File("src/input/CS404SP16RewardMatrixInput1.txt")));
+        Grid grid = new Grid(parseFile(new File("src/input/CS404SP16Test.txt")));
         DijkstrasShortestPath dijkstra = new DijkstrasShortestPath();
         dijkstra.findShortestPath(grid);
 

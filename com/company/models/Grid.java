@@ -37,8 +37,9 @@ public class Grid {
             int weight = Integer.parseInt(values[2].trim());
             GridSquare currentGrid = new GridSquare(coordinate, weight, i);
             currentGrid.setDistanceVal(-1);
-            if (coordinate == endCoordinate) {
+            if (coordinate.getX() == endCoordinate.getX() && coordinate.getY() == endCoordinate.getY()) {
                 mDestinationGridSquare = currentGrid;
+                mDestinationGridSquare.setDestinationGS(true);
             }
             mGridList.add(currentGrid);
             gridSquares[xVal - 1][yVal - 1] = currentGrid;

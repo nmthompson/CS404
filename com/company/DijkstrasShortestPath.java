@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.models.Coordinate;
 import com.company.models.Grid;
 import com.company.models.GridSquare;
 
@@ -45,7 +46,7 @@ public class DijkstrasShortestPath {
      * 1. Add all grid squares to unvistited list
      * 2. Set distance value of pathCost to 0;
      * 3. While unvisited list is not empty
-     *    a. currentGS <- gridsquare in unvisitedList with minimum weight from currentGS
+     *    a. currentGS <- gridsquare in unvisitedList with minimum weight
      *    b. Remove currentGS from unvisitedList
      *    c. For each adjacentGS of currentGS
      *       I. altRoute <- distance value of currentGS + weight of adjGS
@@ -95,17 +96,20 @@ public class DijkstrasShortestPath {
             }
         }
 
+        mVisitedList.add(mCurrentSquare);
+
 //      3. While unvisited list is not empty
         while (!mUnVisitedList.isEmpty()) {
 //          a. currentGS <- gridsquare in unvisitedList with minimum weight from currentGS
 //          b. Remove currentGS from unvisitedList
-            mCurrentSquare = getLowestGSFromCurrent(mCurrentSquare);
+            mCurrentSquare = getLowestGSFromCurrent();
             if (mCurrentSquare == null) {
                 System.out.println("It's null");
                 //Ughhh why is it null at like when mUnvisitedList is down to 20
             }
             mUnVisitedList.remove(mCurrentSquare);
             System.out.println("CurrentSquare = " + mCurrentSquare.getPosition().getX() + "," + mCurrentSquare.getPosition().getY());
+            mVisitedList.add(mCurrentSquare);
 
             addAdjSquares(mCurrentSquare);
 //            c. For each adjacentGS of currentGS
@@ -122,6 +126,11 @@ public class DijkstrasShortestPath {
                 }
             }
 
+            if (mCurrentSquare.isDestinationGS()) {
+                System.out.println("Shortest Path Cost of 4,4 = " + mCurrentSquare.getDistanceVal());
+
+            }
+
 
             //TODO Heap sort for lowest weight access
 
@@ -130,14 +139,13 @@ public class DijkstrasShortestPath {
 
     }
 
-    private GridSquare getLowestGSFromCurrent(GridSquare mCurrentSquare) {
+    private GridSquare getLowestGSFromCurrent() {
         GridSquare lowestSquare = null;
-        addAdjSquares(mCurrentSquare);
-        for (GridSquare gridSquare : mAdjGridSquareList) {
+        for (GridSquare gridSquare : mUnVisitedList) {
             if (lowestSquare == null) {
                 lowestSquare = gridSquare;
             }
-            if (gridSquare.getWeight() < lowestSquare.getWeight()) {
+            if (gridSquare.getDistanceVal() != -1 && gridSquare.getDistanceVal() < lowestSquare.getDistanceVal()) {
                 lowestSquare = gridSquare;
             }
         }
