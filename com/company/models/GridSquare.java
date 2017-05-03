@@ -1,5 +1,7 @@
 package com.company.models;
 
+import java.util.ArrayList;
+
 public class GridSquare {
 
     private Coordinate position;
@@ -7,6 +9,8 @@ public class GridSquare {
     private int index;
     private int distanceVal;
     private GridSquare prevGS;
+    private ArrayList<GridSquare> firstShortestGridPath = new ArrayList<>();
+    private ArrayList<GridSquare> secondShortestGridPath = new ArrayList<>();
 
     private boolean isDestinationGS = false;
 
@@ -55,12 +59,21 @@ public class GridSquare {
         return isDestinationGS;
     }
 
-    public GridSquare getPrevGS() {
-        return prevGS;
+//    public GridSquare getPrevGS() {
+//        return prevGS;
+//    }
+//
+//    public void setPrevGS(GridSquare prevGS) {
+//        this.prevGS = prevGS;
+//    }
+
+
+    public void addGSToFirstShortestPath(ArrayList<GridSquare> gridSquare) {
+        firstShortestGridPath = gridSquare;
     }
 
-    public void setPrevGS(GridSquare prevGS) {
-        this.prevGS = prevGS;
+    public ArrayList<GridSquare> getFirstShortestPath() {
+        return firstShortestGridPath;
     }
 
 }
