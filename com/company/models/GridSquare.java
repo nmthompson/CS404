@@ -6,6 +6,8 @@ public class GridSquare {
     private int weight;
     private int index;
     private int distanceVal;
+    private GridSquare prevGS;
+
     private boolean isDestinationGS = false;
 
     public GridSquare(Coordinate position, int weight, int index) {
@@ -41,12 +43,24 @@ public class GridSquare {
         distanceVal = val;
     }
 
+    public int getDistanceVal() {
+        return distanceVal;
+    }
+
     public void setDestinationGS(boolean bool) {
         isDestinationGS = bool;
     }
 
     public boolean isDestinationGS() {
         return isDestinationGS;
+    }
+
+    public GridSquare getPrevGS() {
+        return prevGS;
+    }
+
+    public void setPrevGS(GridSquare prevGS) {
+        this.prevGS = prevGS;
     }
 
 }
