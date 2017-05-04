@@ -72,6 +72,8 @@ public class GridSquare {
         firstShortestGridPath = gridSquare;
     }
 
+
+
     public ArrayList<GridSquare> getFirstShortestPath() {
         return firstShortestGridPath;
     }

@@ -1,33 +1,13 @@
 package com.company;
 
-import com.company.models.Coordinate;
 import com.company.models.Grid;
 import com.company.models.GridSquare;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-//In order to apply dijkstra's algorithm in a grid there is no need for any modifications, since a grid is a graph in
-// which a node (cell) has 4/8 children (depending on your connectivity) which are the neighbors. Therefore, all you
-// have to do is: choose your root node (where to start), assign it value 0 and then evaluate the 4/8 neighbors, using
-// as cost just 1 (or sqrt(2) if for the 4 diagonal neighbors if you are using 8-connectivity). This root node has to be
-// labeled as visited and the neighbors evaluated are labeled as open. Then, you pick the node(cell) in evaluated that has
-// a minimum value (in this case, all of them will have value 1) so you choose any of them. When adding the neighbors to
-// the open list, it will happen that some of these neigbors are already visited, so you just ignore them. If the are
-// already in the open list, you recompute their value and if they are unvisited, you compute their value and add them
-// to open, and mark the current node as closed.
-//
-//        In fact, you will see that there is no difference at all with the generic Dijkstra's algorithm you have been reading for graphs.
-//
-//        NOTE: in order to be efficient when getting the minimum of the open list, it is recommended to use a heap
-// (usually a binary heap) instead of running the min function along all the open nodes at every iteration.
 
 public class DijkstrasShortestPath {
 
     private Grid mGrid;
-
-    private GridSquare mCurrentSquare;
 
     private ArrayList<GridSquare> mVisitedList = new ArrayList<>();
     private ArrayList<GridSquare> mUnVisitedList = new ArrayList<>();
@@ -56,7 +36,7 @@ public class DijkstrasShortestPath {
 
 //        //TODO check if gridsquares exist. And clean this shit up
 
-        mCurrentSquare =  grid.getGridSquare(0,0);
+        GridSquare mCurrentSquare = grid.getGridSquare(0, 0);
         mCurrentSquare.setDistanceVal(mCurrentSquare.getWeight());
         mUnVisitedList.remove(mCurrentSquare);
 
@@ -91,7 +71,9 @@ public class DijkstrasShortestPath {
 
         mVisitedList.add(mCurrentSquare);
 
+        //Actual Algorithm mostly
         while (!mUnVisitedList.isEmpty()) {
+
             mCurrentSquare = getLowestGSFromCurrent();
             mUnVisitedList.remove(mCurrentSquare);
 //            System.out.println("CurrentSquare = " + mCurrentSquare.getPosition().getX() + "," + mCurrentSquare.getPosition().getY());
@@ -103,14 +85,12 @@ public class DijkstrasShortestPath {
                 int altRoute = mCurrentSquare.getDistanceVal() + adjSquare.getWeight();
                 if (adjSquare.getDistanceVal() == -1 || altRoute < adjSquare.getDistanceVal()) {
                     adjSquare.setDistanceVal(altRoute);
-//                    System.out.println("AdjSquare = " + adjSquare.getPosition().getX() + "," + adjSquare.getPosition().getY() + " distance value = " + adjSquare.getDistanceVal());
-//                    adjSquare.setPrevGS(mCurrentSquare);
-                    ArrayList<GridSquare> currentCost = mCurrentSquare.getFirstShortestPath();
-                    if (!currentCost.contains(mCurrentSquare)) {
-                        currentCost.add(mCurrentSquare);
-                    }
+                    System.out.println("AdjSquare = " + adjSquare.getPosition().getX() + "," + adjSquare.getPosition().getY() + " distance value = " + adjSquare.getDistanceVal());
 
-                    adjSquare.addGSToFirstShortestPath(currentCost);
+
+                    ArrayList<GridSquare> currentList = new ArrayList<>(mCurrentSquare.getFirstShortestPath());
+                    currentList.add(mCurrentSquare);
+                    adjSquare.addGSToFirstShortestPath(currentList);
 
                 }
             }
@@ -119,6 +99,9 @@ public class DijkstrasShortestPath {
 
 
          }
+        for (GridSquare gs : mGrid.getDestinationGridSquare().getFirstShortestPath()) {
+            System.out.println(gs.getPosition().getX() + "," + gs.getPosition().getY());
+        }
 
     }
 
