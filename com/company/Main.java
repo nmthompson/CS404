@@ -21,7 +21,6 @@ public class Main {
         Grid grid = new Grid(parseFile(new File("src/input/CS404SP16Test.txt")));
         DijkstrasShortestPath dijkstra = new DijkstrasShortestPath();
         dijkstra.findShortestPath(grid);
-
     }
 
     private static ArrayList<String> parseFile(File file) {

@@ -9,9 +9,12 @@ public class Grid {
     private GridSquare[][] gridSquares;
 
     private GridSquare mStartGrid, mDestinationGridSquare;
-    private ArrayList<GridSquare> mGridList = new ArrayList<>();
+    private ArrayList<GridSquare> mGridList;
 
     public Grid (ArrayList<String> inputFileList) {
+        if (mGridList == null) {
+            mGridList = new ArrayList<>();
+        }
         //TODO put logic to find end gridsquare into Main
         String destination[] = inputFileList.get(0).split(",");
         Coordinate endCoordinate = new Coordinate(Integer.parseInt(destination[0].trim()), Integer.parseInt(destination[1].trim()));
@@ -38,7 +41,7 @@ public class Grid {
             currentGrid.setDistanceVal(-1);
             if (coordinate.getX() == endCoordinate.getX() && coordinate.getY() == endCoordinate.getY()) {
                 mDestinationGridSquare = currentGrid;
-                mDestinationGridSquare.setDestinationGS(true);
+                mDestinationGridSquare.setDestinationGS();
             }
             mGridList.add(currentGrid);
             gridSquares[xVal - 1][yVal - 1] = currentGrid;

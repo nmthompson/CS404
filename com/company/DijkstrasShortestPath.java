@@ -4,17 +4,21 @@ import com.company.models.Grid;
 import com.company.models.GridSquare;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
-public class DijkstrasShortestPath {
+class DijkstrasShortestPath {
 
     private Grid mGrid;
 
-    private ArrayList<GridSquare> mVisitedList = new ArrayList<>();
-    private ArrayList<GridSquare> mUnVisitedList = new ArrayList<>();
+    private ArrayList<GridSquare> mUnVisitedList;
 
-    private ArrayList<GridSquare> mAdjGridSquareList;
+    private ArrayList<GridSquare> mAdjGridSquareList = new ArrayList<>();
 
-    public DijkstrasShortestPath() {
+    private ArrayList<ArrayList<GridSquare>> pathList = new ArrayList<>();
+
+    private PriorityQueue<GridSquare> minHeapGS = new PriorityQueue<>();
+
+    DijkstrasShortestPath() {
     }
 
     /**
@@ -30,92 +34,49 @@ public class DijkstrasShortestPath {
      *           distanceValue[] of adjGS <- altRoute
      *           PrevGS[] of adjGS <- currentGS
      */
-    public void findShortestPath(Grid grid) {
+    void findShortestPath(Grid grid) {
         mGrid = grid;
-        mUnVisitedList = grid.getGridSquareList();
+        mUnVisitedList = new ArrayList<>(grid.getGridSquareList());
 
-//        //TODO check if gridsquares exist. And clean this shit up
+        minHeapGS.addAll(mUnVisitedList);
 
-        GridSquare mCurrentSquare = grid.getGridSquare(0, 0);
-        mCurrentSquare.setDistanceVal(mCurrentSquare.getWeight());
-        mUnVisitedList.remove(mCurrentSquare);
+        runDijkstrasAlgorithm();
 
-
-        //Basically doing the same thing as our while/for algorithm below, but we know the source grid square and it's exact location
-        //so I just resolve it now for simplicities sake and then go forward with the rest of the algorithm. Will condense later
-        GridSquare adjGS1 = grid.getGridSquare(0, 1);
-        GridSquare adjGS2 = grid.getGridSquare(1, 0);
-        GridSquare lowestAdjGS = null;
-        mAdjGridSquareList = new ArrayList<>();
-        mAdjGridSquareList.add(adjGS1);
-        mAdjGridSquareList.add(adjGS2);
-
-        if (adjGS1.getWeight() <= adjGS2.getWeight()) {
-            lowestAdjGS = adjGS1;
-            mAdjGridSquareList.add(adjGS1);
-            mAdjGridSquareList.add(adjGS2);
-        } else {
-            lowestAdjGS = adjGS2;
-            mAdjGridSquareList.add(adjGS2);
-            mAdjGridSquareList.add(adjGS1);
-        }
-
-        for (GridSquare adjSquare : mAdjGridSquareList) {
-            int altRoute = mCurrentSquare.getWeight() + adjSquare.getWeight();
-            if (adjSquare.getDistanceVal() == -1 || altRoute < adjSquare.getDistanceVal()) {
-                adjSquare.setDistanceVal(altRoute);
-//                adjSquare.setPrevGS(mCurrentSquare);
-//                adjSquare.addGSToFirstShortestPath(mCurrentSquare);
-            }
-        }
-
-        mVisitedList.add(mCurrentSquare);
-
-        //Actual Algorithm mostly
-        while (!mUnVisitedList.isEmpty()) {
-
-            mCurrentSquare = getLowestGSFromCurrent();
-            mUnVisitedList.remove(mCurrentSquare);
-//            System.out.println("CurrentSquare = " + mCurrentSquare.getPosition().getX() + "," + mCurrentSquare.getPosition().getY());
-
-            addAdjSquares(mCurrentSquare);
-
-
-            for (GridSquare adjSquare : mAdjGridSquareList) {
-                int altRoute = mCurrentSquare.getDistanceVal() + adjSquare.getWeight();
-                if (adjSquare.getDistanceVal() == -1 || altRoute < adjSquare.getDistanceVal()) {
-                    adjSquare.setDistanceVal(altRoute);
-                    System.out.println("AdjSquare = " + adjSquare.getPosition().getX() + "," + adjSquare.getPosition().getY() + " distance value = " + adjSquare.getDistanceVal());
-
-
-                    ArrayList<GridSquare> currentList = new ArrayList<>(mCurrentSquare.getFirstShortestPath());
-                    currentList.add(mCurrentSquare);
-                    adjSquare.addGSToFirstShortestPath(currentList);
-
-                }
-            }
-
-            //TODO Heap sort for lowest weight access
-
-
-         }
-        for (GridSquare gs : mGrid.getDestinationGridSquare().getFirstShortestPath()) {
-            System.out.println(gs.getPosition().getX() + "," + gs.getPosition().getY());
-        }
-
+        findSecondShortestPath();
     }
 
-    private GridSquare getLowestGSFromCurrent() {
-        GridSquare lowestSquare = null;
-        for (GridSquare gridSquare : mUnVisitedList) {
-            if (lowestSquare == null) {
-                lowestSquare = gridSquare;
-            }
-            if (gridSquare.getDistanceVal() != -1 && gridSquare.getDistanceVal() < lowestSquare.getDistanceVal()) {
-                lowestSquare = gridSquare;
+    private void runDijkstrasAlgorithm() {
+        GridSquare currentSquare = null;
+        mGrid.getGridSquare(0,0).setDistanceVal(1);
+
+        while (!minHeapGS.isEmpty()) {
+            currentSquare = minHeapGS.peek();
+            mUnVisitedList.remove(currentSquare);
+
+            minHeapGS.clear();
+            minHeapGS.addAll(mUnVisitedList);
+
+            addAdjSquares(currentSquare);
+
+            for (GridSquare adjSquare : mAdjGridSquareList) {
+                int altRoute = currentSquare.getDistanceVal() + adjSquare.getWeight();
+                if (adjSquare.getDistanceVal() == -1 || altRoute < adjSquare.getDistanceVal()) {
+                    adjSquare.setDistanceVal(altRoute);
+
+                    ArrayList<GridSquare> currentList = new ArrayList<>(currentSquare.getFirstShortestPath());
+                    currentList.add(currentSquare);
+                    adjSquare.addGSToFirstShortestPath(currentList);
+
+                } else if (adjSquare.getDistanceVal() == -1 || altRoute > adjSquare.getDistanceVal() && (adjSquare.getSecondDistanceVal() == 0 || altRoute < adjSquare.getSecondDistanceVal())) {
+                    adjSquare.setSecondDistanceVal(altRoute);
+
+                    ArrayList<GridSquare> secondList = new ArrayList<>(currentSquare.getSecondShortestPath());
+                    secondList.add(currentSquare);
+                    adjSquare.addGSToSecondShortestPath(secondList);
+                }
             }
         }
-        return lowestSquare;
+        System.out.println("Grid: " + mGrid.getDestinationGridSquare().getPosition().getX() + "," + mGrid.getDestinationGridSquare().getPosition().getY() + "/n DV= " + mGrid.getDestinationGridSquare().getDistanceVal());
     }
 
     private void addAdjSquares(GridSquare mCurrentSquare) {
@@ -132,11 +93,9 @@ public class DijkstrasShortestPath {
         if (xVal < mGrid.getGridXParam() - 1) {
             gridSquareTop = mGrid.getGridSquare(xVal + 1, yVal);
         }
-
         if (yVal < mGrid.getGridYParam() - 1) {
             gridSquareRight = mGrid.getGridSquare(xVal, yVal + 1);
         }
-
         if (xVal != 0) {
             gridSquareBottom = mGrid.getGridSquare(xVal - 1, yVal);
         }
@@ -144,22 +103,33 @@ public class DijkstrasShortestPath {
             gridSquareLeft = mGrid.getGridSquare(xVal, yVal - 1);
         }
 
-        if (gridSquareTop != null && mUnVisitedList.contains(gridSquareTop)) {
+        if (gridSquareTop != null && minHeapGS.contains(gridSquareTop)) {
             mAdjGridSquareList.add(gridSquareTop);
         }
-        if (gridSquareRight != null && mUnVisitedList.contains(gridSquareRight)) {
+        if (gridSquareRight != null && minHeapGS.contains(gridSquareRight)) {
             mAdjGridSquareList.add(gridSquareRight);
         }
-        if (gridSquareBottom != null && mUnVisitedList.contains(gridSquareBottom)) {
+        if (gridSquareBottom != null && minHeapGS.contains(gridSquareBottom)) {
             mAdjGridSquareList.add(gridSquareBottom);
         }
-        if (gridSquareLeft != null && mUnVisitedList.contains(gridSquareLeft)) {
+        if (gridSquareLeft != null && minHeapGS.contains(gridSquareLeft)) {
             mAdjGridSquareList.add(gridSquareLeft);
         }
 
-
     }
 
+    public void findSecondShortestPath() {
+        ArrayList<GridSquare> shortestPath =  new ArrayList<>(mGrid.getDestinationGridSquare().getFirstShortestPath());
+        int pathCost = 0;
 
+        for (GridSquare gridSquare : shortestPath) {
+            gridSquare.setDistanceVal(-1);
+            mUnVisitedList = new ArrayList<>(mGrid.getGridSquareList());
+            minHeapGS.addAll(mUnVisitedList);
 
+            runDijkstrasAlgorithm();
+            System.out.println(mGrid.getDestinationGridSquare().getDistanceVal());
+
+        }
+    }
 }
