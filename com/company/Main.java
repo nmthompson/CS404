@@ -1,8 +1,6 @@
 package com.company;
 
-import com.company.models.Coordinate;
 import com.company.models.Grid;
-import com.company.models.GridSquare;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,9 +16,14 @@ public class Main {
     //profit
 
     public static void main(String[] args) {
-        Grid grid = new Grid(parseFile(new File("src/input/CS404SP16Test.txt")));
+        ArrayList<String> inputs = parseFile(new File("src/input/CS404SP16Test.txt"));
+        Grid grid = new Grid(inputs);
         DijkstrasShortestPath dijkstra = new DijkstrasShortestPath();
-        dijkstra.findShortestPath(grid);
+        dijkstra.findDijkShortestPath(grid);
+        grid = new Grid(parseFile(new File("src/input/CS404SP16Test.txt")));
+        DynamicShortestPath dynamic = new DynamicShortestPath();
+        dynamic.findDPShortestPath(grid, 3, 3);
+
     }
 
     private static ArrayList<String> parseFile(File file) {
@@ -34,9 +37,6 @@ public class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-        //blah blah logic to parse file that i'll do later
         return inputValues;
     }
 }
